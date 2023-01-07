@@ -8,7 +8,7 @@ clusters:
         provider: minikube.sigs.k8s.io
         version: v1.28.0
       name: cluster_info
-    server: https://172.17.0.1:51143
+    server: https://host.docker.internal:50701
   name: minikube
 contexts:
 - context:
