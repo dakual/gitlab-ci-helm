@@ -37,6 +37,13 @@ deploy:
     - dev    
   variables:
     CHART: nginx-charts
+    KUBE_URL: https://127.0.0.1:50701
+    KUBE_CA_PEM_FILE: /Users/daghan/.minikube/ca.crt
+    KUBE_TOKEN:
+    KUBE_NAMESPACE:
+  before_script:
+    - mkdir -p /root/.kube
+    - cp kube_config /root/.kube/config
   script: 
     - helm dependency update ${CHART}
     - helm upgrade --install myapp ${CHART} --wait
