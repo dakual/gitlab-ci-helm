@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Nginx helm deployment demo
-name: daghan
+name: nginx-charts
 version: 2.1.2
