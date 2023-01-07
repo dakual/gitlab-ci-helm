@@ -1,8 +1,8 @@
 stages:
-  - publish
+  - helm-publish
 
-gitlab-registry:
-  stage: publish
+.gitlab-registry:
+  stage: helm-publish
   image:
     name: alpine/helm:3.10.2
     entrypoint: [""]
@@ -11,7 +11,8 @@ gitlab-registry:
   variables:
     CHART: nginx-charts
   before_script:
-    - helm registry login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - apk add git
+    - helm plugin install --version=v0.10.3 https://github.com/chartmuseum/helm-push.git
     - >
       helm repo add ${CHART}
       --username ${CI_REGISTRY_USER}
@@ -19,7 +20,27 @@ gitlab-registry:
       ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
   script:
     - helm package ${CHART}
-    - helm push ${CHART}*.tgz oci://${CI_REGISTRY_IMAGE}/${CHART}
+    - helm cm-push ${CHART}*.tgz ${CHART}
+  only:
+    refs:
+      - main
+    changes:
+      - nginx-charts/**/*
+
+
+helm-publish:
+  stage: helm-publish
+  image:
+    name: alpine/helm:latest
+    entrypoint: [""]
+  tags: 
+    - dev    
+  variables:
+    CHART: nginx-charts
+  script:
+    - helm repo add --username $CI_REGISTRY_USER --password $CI_REGISTRY_PASSWORD my-repo $CI_REGISTRY
+    - helm package ${CHART}
+    - helm push ${CHART}*.tgz ${CHART}
   only:
     refs:
       - main
