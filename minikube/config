@@ -1,7 +1,7 @@
 apiVersion: v1
 clusters:
 - cluster:
-    certificate-authority: /Users/daghan/.minikube/ca.crt
+    certificate-authority: /root/.kube/ca.crt
     extensions:
     - extension:
         last-update: Sat, 07 Jan 2023 19:47:43 +03
@@ -28,5 +28,5 @@ preferences: {}
 users:
 - name: minikube
   user:
-    client-certificate: /Users/daghan/.minikube/profiles/minikube/client.crt
-    client-key: /Users/daghan/.minikube/profiles/minikube/client.key
+    client-certificate: /root/.kube/client.crt
+    client-key: /root/.kube/client.key
