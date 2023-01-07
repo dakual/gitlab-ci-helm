@@ -43,10 +43,10 @@ deploy:
     KUBE_NAMESPACE:
   before_script:
     - mkdir -p /root/.kube
-    - cp -rf /minikube/config /root/.kube/config
-    - cp -rf /minikube/client.crt /root/.kube/client.crt
-    - cp -rf /minikube/client.key /root/.kube/client.key
-    - cp -rf /minikube/ca.crt /root/.kube/ca.crt
+    - cp -rf ./minikube/config /root/.kube/config
+    - cp -rf ./minikube/client.crt /root/.kube/client.crt
+    - cp -rf ./minikube/client.key /root/.kube/client.key
+    - cp -rf ./minikube/ca.crt /root/.kube/ca.crt
   script: 
     - kubectl version
     - kubectl get pods --all-namespaces
