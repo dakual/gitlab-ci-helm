@@ -48,7 +48,5 @@ deploy:
     - cp -rf ./minikube/client.key /root/.kube/client.key
     - cp -rf ./minikube/ca.crt /root/.kube/ca.crt
   script: 
-    - kubectl version
-    - kubectl get pods --all-namespaces
-    # - helm dependency update ${CHART}
-    # - helm upgrade --install myapp ${CHART} --wait
+    - helm dependency update ${CHART}
+    - helm upgrade --install myapp ${CHART} --wait
