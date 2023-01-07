@@ -20,7 +20,7 @@ helm-package:
       ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
   script:
     - helm package ${CHART}
-    - helm push ${CHART}*.tgz ${CHART}
+    - helm cm-push ${CHART}*.tgz ${CHART}
   only:
     refs:
       - main
