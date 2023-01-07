@@ -8,6 +8,7 @@ variables:
 deploy:
   stage: deploy
   image: alpine/helm:3.2.1
+  entrypoint: [""]
   script:
     - helm upgrade ${APP_NAME} ./nginx-charts --install --values=./nginx-charts/values.yaml --namespace ${NAMESPACE}
   rules:
