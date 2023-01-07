@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-configmap
+  namespace: {{ default .Release.Namespace .Values.namespace }}
+data:
+  index.html: |
+    <html>
+    <head>
+      <h1>My first Helm deployment!</h1>
+    </head>
+    <body>
+      <p>Thanks for checking out my first Helm deployment.</p>
+    </body>
+    </html>

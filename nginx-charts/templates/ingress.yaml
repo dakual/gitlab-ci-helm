@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ default .Release.Namespace .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: {{ default "nginx" .Values.ingressClass }}
+  # defaultBackend:
+  #   service:
+  #     name: {{ .Values.name }}
+  #     port:
+  #       number: {{ .Values.service.port }}
+  rules:
+  - host: {{ .Values.hostName }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.name }}
+            port:
+              number: {{ .Values.service.port }}

@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ default .Release.Namespace .Values.namespace }}
+  labels:
+    app: {{ .Values.name }}
+    version: {{ default .Chart.Version .Values.image.tag }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+      version: {{ default .Chart.Version .Values.image.tag }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+        version: {{ default .Chart.Version .Values.image.tag }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/index.html
+            name: nginx-conf
+            subPath: index.html
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ .Values.name  }}-configmap
