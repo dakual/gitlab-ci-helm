@@ -38,15 +38,73 @@ deploy:
   variables:
     CHART: nginx-charts
     KUBE_URL: https://127.0.0.1:50701
-    KUBE_CA_PEM_FILE: /Users/daghan/.minikube/ca.crt
-    KUBE_TOKEN:
-    KUBE_NAMESPACE:
   before_script:
-    - mkdir -p /root/.kube
-    - cp -rf ./minikube/config /root/.kube/config
-    - cp -rf ./minikube/client.crt /root/.kube/client.crt
-    - cp -rf ./minikube/client.key /root/.kube/client.key
-    - cp -rf ./minikube/ca.crt /root/.kube/ca.crt
+    - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --insecure-skip-tls-verify
+    - kubectl config set-credentials "$CI_PROJECT_ID"
+    - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID"
+    - kubectl config use-context "$CI_PROJECT_ID"
   script: 
     - helm dependency update ${CHART}
     - helm upgrade --install myapp ${CHART} --wait
+
+
+
+# stages:
+#   - helm-publish
+#   - deploy
+
+# gitlab-registry:
+#   stage: helm-publish
+#   image:
+#     name: alpine/helm:3.10.2
+#     entrypoint: [""]
+#   tags: 
+#     - dev    
+#   variables:
+#     CHART: nginx-charts
+#   before_script:
+#     - apk add git
+#     - helm plugin install --version=v0.10.3 https://github.com/chartmuseum/helm-push.git
+#     - >
+#       helm repo add ${CHART}
+#       --username ${CI_REGISTRY_USER}
+#       --password ${CI_REGISTRY_PASSWORD}
+#       ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
+#   script:
+#     - helm package ${CHART}
+#     - helm cm-push ${CHART}*.tgz ${CHART}
+#   only:
+#     refs:
+#       - main
+#     changes:
+#       - nginx-charts/**/*
+
+# deploy:
+#   stage: deploy
+#   image:
+#     name: alpine/helm:3.10.2
+#     entrypoint: [""]
+#   tags: 
+#     - dev    
+#   variables:
+#     CHART: nginx-charts
+#     KUBE_URL: https://127.0.0.1:50701
+#     KUBE_CA_PEM_FILE: /Users/daghan/.minikube/ca.crt
+#     KUBE_TOKEN:
+#     KUBE_NAMESPACE:
+#   before_script:
+#     - mkdir -p /root/.kube
+#     - cp -rf ./minikube/config /root/.kube/config
+#     - cp -rf ./minikube/client.crt /root/.kube/client.crt
+#     - cp -rf ./minikube/client.key /root/.kube/client.key
+#     - cp -rf ./minikube/ca.crt /root/.kube/ca.crt
+#     # # install AWS CLI
+#     # apk add --no-cache python3 py3-pip \
+#     #   && pip3 install --upgrade pip \
+#     #   && pip3 install awscli \
+#     #   && rm -rf /var/cache/apk/*
+#     # # add EKS cluster
+#     # aws eks --region eu-central-1 update-kubeconfig --name mycluster
+#   script: 
+#     - helm dependency update ${CHART}
+#     - helm upgrade --install myapp ${CHART} --wait
