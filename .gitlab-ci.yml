@@ -41,13 +41,12 @@ deploy:
   before_script:
     - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
     - chmod +x kubectl && mv kubectl /usr/bin/kubectl
-    - kubectl version --client
     - kubectl config get-contexts
     - kubectl config use-context dakual/gitlab-ci-helm:dev  
     - chmod 600 $KUBECONFIG
   script:
     - helm dependency update ${CHART}
-    - helm upgrade --install myapp ${CHART} --wait
+    - helm upgrade --install ${CHART} ${CHART} --wait
   dependencies:
     - gitlab-registry
   only:
@@ -65,8 +64,15 @@ uninstall:
     - dev
   variables:
     CHART: nginx-charts
+  before_script:
+    - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
+    - chmod +x kubectl && mv kubectl /usr/bin/kubectl
+    - kubectl config get-contexts
+    - kubectl config use-context dakual/gitlab-ci-helm:dev  
+    - chmod 600 $KUBECONFIG
   script:
-    - helm uninstall myapp
+    - helm uninstall ${CHART}
+  when: manual
   only:
     refs:
       - main
