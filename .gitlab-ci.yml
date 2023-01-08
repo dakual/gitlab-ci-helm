@@ -53,7 +53,7 @@ helm-install:
     - helm dependency update ${CHART}
     - helm upgrade --install ${APP} ${CHART} --wait
   dependencies:
-    - gitlab-registry
+    - push-registry
 
 helm-uninstall:
   stage: destroy
