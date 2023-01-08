@@ -40,6 +40,7 @@ deploy:
   before_script:
     - curl -LO https://dl.k8s.io/release/v1.26.0/bin/darwin/arm64/kubectl
     - chmod +x kubectl && mv kubectl /usr/bin/kubectl
+    - kubectl version
     - kubectl config get-contexts
     - kubectl config use-context dakual/gitlab-ci-helm:dev  
   script:
