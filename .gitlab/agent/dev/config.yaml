@@ -1,3 +1,5 @@
 gitops:
   manifest_projects:
   - id: dakual/gitlab-ci-helm
+    paths:
+    - glob: '/**/*.{yaml,yml,json}'
