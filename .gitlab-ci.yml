@@ -29,6 +29,7 @@ image:
 
 stages:
   - publish
+  - dry-run
   - deploy
   - destroy
 
@@ -43,6 +44,18 @@ push-registry:
   artifacts:
     paths:
       - ${CHART}*.tgz
+
+helm-dry-run:
+  stage: test
+  extends: .helm
+  tags: 
+    - ${RUNNER}  
+  script:
+    - helm dependency update ${CHART}
+    - helm upgrade --install ${APP} ${CHART} --dry-run --wait
+  dependencies:
+    - push-registry
+
 
 helm-install:
   stage: deploy
@@ -61,7 +74,7 @@ helm-uninstall:
   tags:
     - ${RUNNER}
   script:
-    - helm uninstall ${CHART}
+    - helm uninstall ${APP}
   when: manual
 
 
