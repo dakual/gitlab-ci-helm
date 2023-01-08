@@ -37,12 +37,16 @@ stages:
 helm-template:
   stage: validate
   extends: .helm
+  tags: 
+    - ${RUNNER}  
   script:
     - helm template ${CHART}
 
 helm-lint:
   stage: validate
   extends: .helm
+  tags: 
+    - ${RUNNER}  
   script:
     - helm lint ${CHART}
 
