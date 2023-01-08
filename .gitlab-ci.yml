@@ -1,18 +1,14 @@
-stages:
-  - publish
-  - deploy
-  - destroy
+variables:
+  CHART: nginx-charts
+  APP: nginx-demo
+  RUNNER: dev
 
-gitlab-registry:
-  stage: publish
-  image:
-    name: alpine/helm:3.10.2
-    entrypoint: [""]
-  tags: 
-    - dev    
-  variables:
-    CHART: nginx-charts
-  before_script:
+image:
+  name: alpine/helm:3.10.2
+  entrypoint: [""]
+
+.helm:
+  script:
     - apk add git
     - helm plugin install --version=v0.10.3 https://github.com/chartmuseum/helm-push.git
     - >
@@ -20,62 +16,54 @@ gitlab-registry:
       --username ${CI_REGISTRY_USER}
       --password ${CI_REGISTRY_PASSWORD}
       ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
+    - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
+    - chmod +x kubectl && mv kubectl /usr/bin/kubectl
+    - kubectl config get-contexts
+    - kubectl config use-context dakual/gitlab-ci-helm:dev  
+    - chmod 600 $KUBECONFIG
+  only:
+    refs:
+      - main
+    changes:
+      - ${CHART}/**/*
+
+stages:
+  - publish
+  - deploy
+  - destroy
+
+push-registry:
+  stage: publish
+  extends: .helm
+  tags: 
+    - ${RUNNER}
   script:
     - helm package ${CHART}
     - helm cm-push ${CHART}*.tgz ${CHART}
-  only:
-    refs:
-      - main
-    changes:
-      - nginx-charts/**/*
+  artifacts:
+    paths:
+      - ${CHART}*.tgz
 
-deploy:
-  image:
-    name: alpine/helm:3.10.2
-    entrypoint: ['']
+helm-install:
   stage: deploy
-  tags:
-    - dev
-  variables:
-    CHART: nginx-charts
-  before_script:
-    - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
-    - chmod +x kubectl && mv kubectl /usr/bin/kubectl
-    - kubectl config get-contexts
-    - kubectl config use-context dakual/gitlab-ci-helm:dev  
-    - chmod 600 $KUBECONFIG
+  extends: .helm
+  tags: 
+    - ${RUNNER}  
   script:
     - helm dependency update ${CHART}
-    - helm upgrade --install ${CHART} ${CHART} --wait
+    - helm upgrade --install ${APP} ${CHART} --wait
   dependencies:
     - gitlab-registry
-  only:
-    refs:
-      - main
-    changes:
-      - nginx-charts/**/*
 
-uninstall:
-  image:
-    name: alpine/helm:3.10.2
-    entrypoint: ['']
+helm-uninstall:
   stage: destroy
+  extends: .helm
   tags:
-    - dev
-  variables:
-    CHART: nginx-charts
-  before_script:
-    - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
-    - chmod +x kubectl && mv kubectl /usr/bin/kubectl
-    - kubectl config get-contexts
-    - kubectl config use-context dakual/gitlab-ci-helm:dev  
-    - chmod 600 $KUBECONFIG
+    - ${RUNNER}
   script:
     - helm uninstall ${CHART}
   when: manual
-  only:
-    refs:
-      - main
+
 
 # deploy:
 #   stage: deploy
