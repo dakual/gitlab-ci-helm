@@ -25,13 +25,26 @@ image:
     refs:
       - main
     changes:
-      - ${CHART}/**/*
+      - nginx-charts/**/*
 
 stages:
+  - validate
   - publish
   - test
   - deploy
   - destroy
+
+helm-template:
+  stage: validate
+  extends: .helm
+  script:
+    - helm template ${CHART}
+
+helm-lint:
+  stage: validate
+  extends: .helm
+  script:
+    - helm lint ${CHART}
 
 push-registry:
   stage: publish
