@@ -44,7 +44,7 @@ deploy:
     # - kubectl config get-contexts
     # - kubectl config use-context dakual/gitlab-ci-helm:dev  
     # - chmod 600 $KUBECONFIG
-    - helm init --kube-context dakual/gitlab-ci-helm:dev --upgrade
+    - helm --kube-context dakual/gitlab-ci-helm:dev --upgrade
   script:
     - helm dependency update ${CHART}
     - helm upgrade --install myapp ${CHART} --wait
