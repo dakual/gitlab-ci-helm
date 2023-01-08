@@ -38,15 +38,13 @@ deploy:
   variables:
     CHART: nginx-charts
   before_script:
-    - uname -a
-    - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
-    - chmod +x kubectl && mv kubectl /usr/bin/kubectl
-    - kubectl version --client
-    - kubectl config get-contexts
-    - kubectl config use-context dakual/gitlab-ci-helm:dev  
-    - echo $KUBECONFIG
-    - chmod 600 $KUBECONFIG
-    # - chmod 600 ~/.kube/config
+    # - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
+    # - chmod +x kubectl && mv kubectl /usr/bin/kubectl
+    # - kubectl version --client
+    # - kubectl config get-contexts
+    # - kubectl config use-context dakual/gitlab-ci-helm:dev  
+    # - chmod 600 $KUBECONFIG
+    - helm init --kube-context dakual/gitlab-ci-helm:dev --upgrade
   script:
     - helm dependency update ${CHART}
     - helm upgrade --install myapp ${CHART} --wait
