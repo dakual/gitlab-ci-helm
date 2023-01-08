@@ -38,6 +38,7 @@ deploy:
   variables:
     CHART: nginx-charts
   before_script:
+    - uname -a
     - curl -LO https://dl.k8s.io/release/v1.26.0/bin/darwin/arm64/kubectl
     - chmod +x kubectl && mv kubectl /usr/bin/kubectl
     - kubectl version
