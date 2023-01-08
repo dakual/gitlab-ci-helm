@@ -1,9 +1,9 @@
 stages:
-  - helm-publish
+  - publish
   - deploy
 
 gitlab-registry:
-  stage: helm-publish
+  stage: publish
   image:
     name: alpine/helm:3.10.2
     entrypoint: [""]
@@ -44,7 +44,8 @@ deploy:
     # - kubectl config get-contexts
     # - kubectl config use-context dakual/gitlab-ci-helm:dev  
     # - chmod 600 $KUBECONFIG
-    - helm --kube-context dakual/gitlab-ci-helm:dev --upgrade
+    - helm --kube-context dakual/gitlab-ci-helm:dev
+    - chmod 600 $KUBECONFIG
   script:
     - helm dependency update ${CHART}
     - helm upgrade --install myapp ${CHART} --wait
