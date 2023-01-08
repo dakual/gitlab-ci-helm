@@ -1,6 +1,7 @@
 stages:
   - publish
   - deploy
+  - destroy
 
 gitlab-registry:
   stage: publish
@@ -38,13 +39,11 @@ deploy:
   variables:
     CHART: nginx-charts
   before_script:
-    # - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
-    # - chmod +x kubectl && mv kubectl /usr/bin/kubectl
-    # - kubectl version --client
-    # - kubectl config get-contexts
-    # - kubectl config use-context dakual/gitlab-ci-helm:dev  
-    # - chmod 600 $KUBECONFIG
-    - helm lint --kube-context dakual/gitlab-ci-helm:dev
+    - curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/arm64/kubectl
+    - chmod +x kubectl && mv kubectl /usr/bin/kubectl
+    - kubectl version --client
+    - kubectl config get-contexts
+    - kubectl config use-context dakual/gitlab-ci-helm:dev  
     - chmod 600 $KUBECONFIG
   script:
     - helm dependency update ${CHART}
@@ -57,6 +56,20 @@ deploy:
     changes:
       - nginx-charts/**/*
 
+uninstall:
+  image:
+    name: alpine/helm:3.10.2
+    entrypoint: ['']
+  stage: destroy
+  tags:
+    - dev
+  variables:
+    CHART: nginx-charts
+  script:
+    - helm uninstall myapp
+  only:
+    refs:
+      - main
 
 # deploy:
 #   stage: deploy
