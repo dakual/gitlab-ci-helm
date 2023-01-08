@@ -29,7 +29,7 @@ image:
 
 stages:
   - publish
-  - dry-run
+  - test
   - deploy
   - destroy
 
