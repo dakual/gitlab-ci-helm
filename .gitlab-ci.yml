@@ -9,6 +9,7 @@ image:
 
 .helm:
   before_script:
+    - chmod 600 $KUBECONFIG
     - apk add git
     - helm plugin install --version=v0.10.3 https://github.com/chartmuseum/helm-push.git
     - >
@@ -20,7 +21,6 @@ image:
     - chmod +x kubectl && mv kubectl /usr/bin/kubectl
     - kubectl config get-contexts
     - kubectl config use-context dakual/gitlab-ci-helm:dev  
-    - chmod 600 $KUBECONFIG
   only:
     refs:
       - main
